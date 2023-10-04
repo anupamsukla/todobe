@@ -42,3 +42,40 @@ app.post("/todos", (req, res) => {
           }
       });
 })
+
+app.put("/todos/:id",async (req, res) => {
+
+  const id = req.params.id;
+  const name = req.body.name;
+  const done = req.body.done;
+  try {
+    const existingTodo =  connection.query('SELECT * FROM todo WHERE id = ?', [id]);
+
+    if (existingTodo.length === 0) {
+      return res.status(404).json({ error: 'TODO not found' });
+    }
+
+    // Update the TODO with the new data
+    connection.query('UPDATE todo SET name = ?, done = ? WHERE id = ?', [name, done, id], (error, results) => {
+      if (error) {
+        console.error('Error updating TODO:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      // Check the affectedRows property to verify if the update was successful
+      if (results.affectedRows === 1) {
+        res.json({ message: 'TODO updated successfully' });
+      } else {
+        res.status(500).json({ error: 'Failed to update TODO' });
+      }
+    });
+
+    
+    // Return the updated TODO
+    res.json({ message: 'TODO updated successfully' });
+  } catch (error) {
+    console.error('Error updating TODO:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+
+  })
