@@ -18,6 +18,10 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
+app.get('/', (req, res) => {
+  res.send('welcome to todo app')
+})
+
 
 app.get('/todos', (req, res) => {
   connection.query('SELECT * FROM todo', function (err, rows, fields) {
