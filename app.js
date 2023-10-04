@@ -20,8 +20,25 @@ app.listen(PORT, () => {
 
 
 app.get('/todos', (req, res) => {
-  connection.query('SELECT * FROM users', function (err, rows, fields) {
+  connection.query('SELECT * FROM todo', function (err, rows, fields) {
     if (err) throw err
     res.send(rows)
   })
+})
+
+
+app.post("/todos", (req, res) => {
+  const name = 'req.body.name';
+  const age = req.body.age;
+  // INSERT INTO todo (name, done) VALUES ('Task 1', false);
+  connection.query('INSERT INTO todo (name,done) VALUES (?,?)', ['Task 3', false],
+      (err, result, field) => {
+          if (err) {
+              console.log(err);
+          }
+          else {
+              return res.json("successfully created ");
+
+          }
+      });
 })
