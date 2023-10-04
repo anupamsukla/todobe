@@ -1,19 +1,27 @@
-const express = require('express')
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors=require('cors')
 
-const app = express()
-const PORT = 4000
+require('dotenv').config()
+const mysql = require('mysql2')
+const connection = mysql.createConnection(process.env.DATABASE_URL)
+connection.connect()
+
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+app.use(bodyParser.json());
+app.use(cors())
 
 app.listen(PORT, () => {
-  console.log(`API listening on PORT ${PORT} `)
-})
+  console.log(`Server is running on port ${PORT}`);
+});
 
-app.get('/', (req, res) => {
-  res.send('Hey this is my API running 🥳')
-})
 
-app.get('/about', (req, res) => {
-  res.send('This is my about route..... ')
+app.get('/todos', (req, res) => {
+  connection.query('SELECT * FROM users', function (err, rows, fields) {
+    if (err) throw err
+    res.send(rows)
+  })
 })
-
-// Export the Express API
-module.exports = app
