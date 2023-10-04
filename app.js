@@ -84,6 +84,7 @@ app.put("/todos/:id",async (req, res) => {
 
   })
 
-app.get('*', (req, res) => {
-    res.status(404).json({ error: 'Path not found' });
+  app.get('*', (req, res) => {
+    const requestedPath = req.originalUrl;
+    res.status(404).json({ error: `Path '${requestedPath}' not found` });
   });
