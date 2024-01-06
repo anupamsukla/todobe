@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors=require('cors')
+const cors = require('cors')
 
 require('dotenv').config()
 const mysql = require('mysql2')
@@ -24,36 +24,56 @@ app.get('/', (req, res) => {
 
 
 app.get('/todos', (req, res) => {
+
+  const id = req.params.id;
+  const existingTodo = connection.query('SELECT * FROM todo WHERE id = ?', [id]);
+
   connection.query('SELECT * FROM todo', function (err, rows, fields) {
     if (err) throw err
-    res.send(rows)
+    res.json({ data: rows })
   })
+})
+
+app.get('/todos/:id', async (req, res) => {
+  const id = req.params.id;
+  connection.query('SELECT * FROM todo WHERE id = ?', [id],
+    (err, result, field) => {
+      if (err) {
+        console.log(err);
+      }
+      else {
+        return res.json({ response: "successfully created ", data: result[0] });
+      }
+    });
+
 })
 
 
 app.post("/todos", (req, res) => {
-  const name = 'req.body.name';
-  const age = req.body.age;
+  const name = req.body.name;
+  const done = req.body.done;
+  let id = parseInt((Math.random()) * 1000)
   // INSERT INTO todo (name, done) VALUES ('Task 1', false);
-  connection.query('INSERT INTO todo (name,done) VALUES (?,?)', ['Task 3', false],
-      (err, result, field) => {
-          if (err) {
-              console.log(err);
-          }
-          else {
-              return res.json("successfully created ");
+  connection.query('INSERT INTO todo (name,done,id) VALUES (?,?,?)', [name, done, id],
+    (err, result, field) => {
+      if (err) {
+        console.log(err);
+      }
+      else {
+        return res.json("successfully created ");
 
-          }
-      });
+      }
+    });
 })
 
-app.put("/todos/:id",async (req, res) => {
+
+app.put("/todos/:id", async (req, res) => {
 
   const id = req.params.id;
   const name = req.body.name;
   const done = req.body.done;
   try {
-    const existingTodo =  connection.query('SELECT * FROM todo WHERE id = ?', [id]);
+    const existingTodo = connection.query('SELECT * FROM todo WHERE id = ?', [id]);
 
     if (existingTodo.length === 0) {
       return res.status(404).json({ error: 'TODO not found' });
@@ -74,7 +94,7 @@ app.put("/todos/:id",async (req, res) => {
       }
     });
 
-    
+
     // Return the updated TODO
     res.json({ message: 'TODO updated successfully' });
   } catch (error) {
@@ -82,9 +102,9 @@ app.put("/todos/:id",async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 
-  })
+})
 
-  app.get('*', (req, res) => {
-    const requestedPath = req.originalUrl;
-    res.status(404).json({ error: `Path '${requestedPath}' not found` });
-  });
+app.get('*', (req, res) => {
+  const requestedPath = req.originalUrl;
+  res.status(404).json({ error: `Path '${requestedPath}' not found` });
+});
