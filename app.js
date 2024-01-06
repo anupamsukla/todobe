@@ -54,7 +54,7 @@ app.post("/todos", (req, res) => {
   const done = req.body.done;
   let id = parseInt((Math.random()) * 1000)
   // INSERT INTO todo (name, done) VALUES ('Task 1', false);
-  connection.query('INSERT INTO todo (name,done,id) VALUES (?,?,?)', [name, done, id],
+  connection.query('INSERT INTO todo (name,title,done) VALUES (?,?,?)', [name,name, done],
     (err, result, field) => {
       if (err) {
         console.log(err);
